@@ -1,0 +1,60 @@
+# project configuration for unit test
+
+[servers]
+    # only open main port to public
+    [servers.main]
+    address = ":8000"
+    [servers.debug]
+    address = ":9000"
+    [servers.admin]
+    address = ":5276"
+
+[log]
+    level = "info"
+    file = "test"
+    use_color = true 
+
+[resources]
+    # object storage
+    [[resources.object_storage]]
+    name = "image-private"
+    bucket = "${STORAGE_IMAGE_PRIVATE_BUCKET}"
+    provider = "${STORAGE_IMAGE_PRIVATE_PROVIDER}"
+    region = "${STORAGE_IMAGE_PRIVATE_REGION}"
+    endpoint = "${STORAGE_IMAGE_PRIVATE_ENDPOINT}"
+        [resources.object_storage.s3]
+        client_id = "${STORAGE_IMAGE_CLIENT_ID}"
+        client_secret = "${STORAGE_IMAGE_CLIENT_SECRET}"
+        disable_ssl = ${STORAGE_IMAGE_DISABLE_SSL}
+        force_path_style = ${STORAGE_IMAGE_FOCE_PATH_STYLE}
+    
+    # database
+    [resources.database]
+    # default options
+    max_open_conns = 20 
+    max_retry = 5
+        [[resources.database.connect]]
+        name = "users"
+        driver = "postgres"
+            [resources.database.connect.leader]
+            dsn = "${DB_USER_LEADER_DSN}"
+            [resources.database.connect.replica]
+            dsn = "${DB_USER_REPLICA_DSN}"
+
+        [[resources.database.connect]]
+        name = "notifications"
+        driver = "postgres"
+            [resources.database.connect.leader]
+            dsn = "${DB_NOTIFICATION_LEADER_DSN}"
+            [resources.database.connect.replica]
+            dsn = "${DB_NOTIFICATION_REPLICA_DSN}"
+
+    # redis
+    [resources.redis]
+    max_active_conn = 100 
+        [[resources.redis.connect]]
+        name = "session"
+        address = "${REDIS_SESSION_ADDRESS}"
+        [[resources.redis.connect]]
+        name = "image"
+        address = "${REDIS_IMAGE_ADDRESS}"
